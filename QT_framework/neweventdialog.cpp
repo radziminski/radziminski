@@ -51,15 +51,17 @@ void NewEventDialog::on_saveBtn_clicked()
     if (this->currentEvent)
     {
         for (int i = 0; i < this->events->length(); i++)
-               if (this->currentEvent->time == this->events->value(i).time && (this->currentEvent->description == this->events->value(i).description || (this->currentEvent->description.isEmpty() && this->events->value(i).description.isEmpty())))
+        {
+               if (this->currentEvent->date == this->events->value(i).date && this->currentEvent->time == this->events->value(i).time && (this->currentEvent->description == this->events->value(i).description || (this->currentEvent->description.isEmpty() && this->events->value(i).description.isEmpty())))
                {
                    this->events->remove(i);
                    break;
                }
-    }
 
+        }
+    }
     // Adding new event to Events vector
-    Event newEvent = {currentDate, time, desc->toPlainText()};
+    Event newEvent = {this->currentDate, time, desc->toPlainText()};
     this->events->push_back(newEvent);
 
     this->accept();

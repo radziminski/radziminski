@@ -3,9 +3,8 @@
 
 #include <QMainWindow>
 #include <QDate>
-#include <QButtonGroup>
-#include <QVector>
 #include "event.h"
+#include "eventsmodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,28 +20,20 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_nextMonth_clicked();
-    void on_prevMonth_clicked();
-    void buttonWasClicked(int);
+    void onDayClicked(const QDate &date);
 
 private:
-
-    QVector<Event> events;
     Ui::MainWindow *ui;
-    QDate currentDate;
-    QButtonGroup days;
-
+    EventsModel model;
 
     // Methods
     void readEventsFile();
     void saveEventsFile();
-    void addEvent(Event);
-    bool removeEvent(int position);
-    void renderDays();
-    void nextMonth();
-    void prevMonth();
-    void updateMonthLabel();
-    void buttonsInit();
+    void calendarInit();
+    void updateDaysStyling();
 };
 
 #endif // MAINWINDOW_H
+
+//****  Author: Jan Radzimiński   **********************************
+//****  Index Number: 293052      **********************************

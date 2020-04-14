@@ -17,6 +17,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     eventsdialog.cpp \
+    eventsmodel.cpp \
+    eventsmodelfilter.cpp \
     main.cpp \
     mainwindow.cpp \
     neweventdialog.cpp
@@ -24,6 +26,8 @@ SOURCES += \
 HEADERS += \
     event.h \
     eventsdialog.h \
+    eventsmodel.h \
+    eventsmodelfilter.h \
     mainwindow.h \
     neweventdialog.h
 

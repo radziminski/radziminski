@@ -1,14 +1,14 @@
 #include "neweventdialog.h"
 #include "ui_neweventdialog.h"
+#include <QWidget>
 
-NewEventDialog::NewEventDialog(QVector<Event> *events, QDate currentDate, QWidget *parent, Event *editedEvent) :
+NewEventDialog::NewEventDialog(EventsModel *model, QDate currentDate, QWidget *parent, Event *editedEvent) :
     QDialog(parent),
     ui(new Ui::NewEventDialog)
 {
     // Setting up UI
     ui->setupUi(this);
-
-    this->events = events;
+    this->model = model;
     this->currentDate = currentDate;
 
     // Window title
@@ -19,10 +19,14 @@ NewEventDialog::NewEventDialog(QVector<Event> *events, QDate currentDate, QWidge
     if (editedEvent)
     {
         this->currentEvent = editedEvent;
-        this->inputsInit(editedEvent->time, editedEvent->description);
+        this->inputsInit(editedEvent->getTime(), editedEvent->getDescription());
     } else {
         this->currentEvent = nullptr;
     }
+
+    // Connecting buttons
+    connect(this->ui->saveBtn, SIGNAL(clicked()), this, SLOT(onSaveClicked()));
+    connect(this->ui->cancelBtn, SIGNAL(clicked()), this, SLOT(onCancelClicked()));
 }
 
 NewEventDialog::~NewEventDialog()
@@ -30,41 +34,36 @@ NewEventDialog::~NewEventDialog()
     delete ui;
 }
 
-void NewEventDialog::inputsInit(QTime time, QString desc)
+void NewEventDialog::inputsInit(const QTime &time, const QString &desc)
 {
-    this->findChild<QTimeEdit*>("eventTime")->setTime(time);
-    this->findChild<QTextEdit*>("eventDesc")->setText(desc);
+    // Passing time and desc from edited event to inputs
+    ui->eventTime->setTime(time);
+    ui->eventDesc->setText(desc);
 }
 
-void NewEventDialog::on_cancelBtn_clicked()
+void NewEventDialog::onCancelClicked()
 {
+    // Cancel
     this->reject();
     this->close();
 }
 
-void NewEventDialog::on_saveBtn_clicked()
+void NewEventDialog::onSaveClicked()
 {
-    QTime time = this->findChild<QTimeEdit*>("eventTime")->time();
-    QTextEdit *desc = this->findChild<QTextEdit*>("eventDesc");
+    QTime time = ui->eventTime->time();
 
-    // Overwriting event in case of edit
+    // Overwriting event in case of edit - deletieng the previous version and adding with corrected time and description
     if (this->currentEvent)
-    {
-        for (int i = 0; i < this->events->length(); i++)
-        {
-               if (this->currentEvent->date == this->events->value(i).date && this->currentEvent->time == this->events->value(i).time && (this->currentEvent->description == this->events->value(i).description || (this->currentEvent->description.isEmpty() && this->events->value(i).description.isEmpty())))
-               {
-                   this->events->remove(i);
-                   break;
-               }
+        this->model->remove(*this->currentEvent);
 
-        }
-    }
+    Event newEvent = {this->currentDate, time, ui->eventDesc->toPlainText()};
+
     // Adding new event to Events vector
-    Event newEvent = {this->currentDate, time, desc->toPlainText()};
-    this->events->push_back(newEvent);
-
+    this->model->add(newEvent);
     this->accept();
     this->close();
 
 }
+
+//****  Author: Jan Radzimiński   **********************************
+//****  Index Number: 293052      **********************************

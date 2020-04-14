@@ -3,9 +3,11 @@
 
 #include <QDialog>
 #include <QDate>
-#include <QVector>
-#include <QButtonGroup>
+#include <QTableView>
+#include <QModelIndex>
 #include "event.h"
+#include "eventsmodel.h"
+#include "eventsmodelfilter.h"
 
 namespace Ui {
 class EventsDialog;
@@ -16,29 +18,31 @@ class EventsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit EventsDialog(QVector<Event> *events, QDate currentDate, QWidget *parent = nullptr);
+    explicit EventsDialog(EventsModel *model, QDate currentDate, QWidget *parent = nullptr);
     ~EventsDialog();
 
 private slots:
-     void deleteButtonWasClicked(int);
-     void editEvent(int);
+     void onDelete();
+     void onEdit();
      void closeWindow();
-     void addEvent();
+     void onAdd();
 
 private:
-
     QDate currentDate;
-    QVector<Event> *events;
-    QButtonGroup editBtns;
-    QButtonGroup deleteBtns;
-
+    EventsModel *model;
+    EventsModelFilter modelFiltered;
+    QTableView eventsView;
 
     // Methods
-    void renderEvents(bool firstTime = false);
-    static bool sortRule(const Event &ev1, const Event &ev2);
-
-
+    void windowUiInit();
+    void tableUiInit();
+    void resized();
+    int getSelectedRow();
+    QModelIndex getSelectedIndex();
 
 };
 
 #endif // EVENTSDIALOG_H
+
+//****  Author: Jan Radzimiński   **********************************
+//****  Index Number: 293052      **********************************

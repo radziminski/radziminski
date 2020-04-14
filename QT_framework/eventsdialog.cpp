@@ -1,140 +1,175 @@
 #include "eventsdialog.h"
 #include <QLabel>
-#include <QVector>
 #include <QSplitter>
 #include <QBoxLayout>
-#include <QDialogButtonBox>
 #include <QPushButton>
-#include <QDebug>
 #include <QLayoutItem>
-#include <QGroupBox>
 #include <QDesktopWidget>
+#include <QTableView>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QDebug>
 #include "neweventdialog.h"
 
-EventsDialog::EventsDialog(QVector<Event> *events, QDate currentDate, QWidget *parent) :
+
+EventsDialog::EventsDialog(EventsModel *model, QDate currentDate, QWidget *parent) :
     QDialog(parent)
 {
-    this->events = events;
-    this->setWindowTitle(currentDate.toString("dd-MM-yyyy"));
+    // Setting up model (and filtering only events form  given day)
+    this->model = model;
+    this->modelFiltered.setDateFilter(currentDate);
+    this->modelFiltered.setSourceModel(model);
+    this->modelFiltered.sort(0);
     this->currentDate = currentDate;
 
-    resize(QDesktopWidget().availableGeometry(this).size() * 0.15);
+    // Setting window styling
+    this->setWindowTitle(currentDate.toString("dd-MM-yyyy"));
+    this->setMinimumWidth(380);
+    this->setStyleSheet("* {background-color: #efffea;} QPushButton {background-color: #27ae60; border: none; color: white; font-weight: 400} QPushButton:hover {background-color: #2bc46b;} QPushButton:pressed {background-color: #1d9950;}");
+
+    // Makes the window resize more nicely
+    this->resize(QDesktopWidget().availableGeometry(this).size() * 0.15);
     this->setModal(true);
-    this->renderEvents(true);
+
+    // Setting window UI
+    this->resized();
+    this->windowUiInit();
 }
 
 EventsDialog::~EventsDialog()
 {
+    // Destructor
 }
 
-void EventsDialog::deleteButtonWasClicked(int id)
+void EventsDialog::resized()
 {
-    this->events->remove(id);
-    this->renderEvents();
+    // Increasing window size if event was added (up to certain point - then scroll bar appears)
+    int minimumHeight = this->modelFiltered.rowCount() * 30 + 101;
+    if (minimumHeight > 500) minimumHeight = 500;
+    this->setMinimumHeight(minimumHeight);
 }
 
-void EventsDialog::renderEvents(bool firstTime)
+void EventsDialog::tableUiInit()
 {
+    this->eventsView.setModel(&this->modelFiltered);
+    this->eventsView.showMaximized();
+    this->eventsView.horizontalHeader()->setStretchLastSection(true);
+    this->eventsView.verticalHeader()->hide();
+    this->eventsView.setSelectionBehavior(QAbstractItemView::SelectRows);
+    this->eventsView.setSelectionMode( QAbstractItemView::SingleSelection );
+    this->eventsView.setStyleSheet("background-color: white");
+}
 
-    if (!firstTime)
-    {
-        disconnect(&this->deleteBtns, SIGNAL(buttonClicked(int)), this, SLOT(deleteButtonWasClicked(int)));
-        disconnect(&this->editBtns, SIGNAL(buttonClicked(int)), this, SLOT(editEvent(int)));
-        qDeleteAll(this->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly));
-    }
-    delete layout();
+void EventsDialog::windowUiInit()
+{
+    this->tableUiInit();
 
+    // And re-render Layout
     QBoxLayout *windowLayout = new QBoxLayout(QBoxLayout::TopToBottom);
+    windowLayout->setMargin(15);
+    // Creating table view based on model
 
-    QBoxLayout *rowSplitterTitles = new QBoxLayout(QBoxLayout::LeftToRight);
-    rowSplitterTitles->addWidget(new QLabel("Time: ", this));
-    rowSplitterTitles->addWidget(new QLabel("Description:", this));
-    rowSplitterTitles->addWidget(new QLabel("", this));
-    rowSplitterTitles->addWidget(new QLabel("", this));
-    windowLayout->addLayout(rowSplitterTitles);
-
-    // Generating events
-    bool flag = false;
-    std::sort(this->events->begin(), this->events->end(), this->sortRule);
-    for (int i = 0; i < this->events->length(); i++)
-    {
-
-        QBoxLayout *rowSplitter = new QBoxLayout(QBoxLayout::LeftToRight);
-        if (this->events->value(i).date == currentDate)
-        {
-            flag = true;
-            rowSplitter->addWidget(new QLabel(events->value(i).time.toString("hh:mm"), this));
-            QLabel *desc = new QLabel(events->value(i).description, this);
-            desc->setMaximumWidth(150);
-            rowSplitter->addWidget(desc);
-            this->editBtns.addButton(new QPushButton("Edit", this), i);
-            rowSplitter->addWidget( this->editBtns.button(i));
-            this->deleteBtns.addButton(new QPushButton("Delete", this), i);
-            rowSplitter->addWidget( this->deleteBtns.button(i));
-        }
-        windowLayout->addLayout(rowSplitter);
-    }
-    if (!flag) {
-        QBoxLayout *rowSplitter = new QBoxLayout(QBoxLayout::LeftToRight);
-        rowSplitter->addWidget(new QLabel("There are no events on that day.", this));
-        windowLayout->addLayout(rowSplitter);
-    } else {
-        // Connecting edit and delete buttons
-        connect(&this->deleteBtns, SIGNAL(buttonClicked(int)), this, SLOT(deleteButtonWasClicked(int)));
-        connect(&this->editBtns, SIGNAL(buttonClicked(int)), this, SLOT(editEvent(int)));
-    }
-
-
+    QBoxLayout *tableLayout = new QBoxLayout(QBoxLayout::LeftToRight);
+    tableLayout->addWidget(&this->eventsView);
+    windowLayout->addLayout(tableLayout);
 
     // Creating add and close buttons
     QBoxLayout *rowSplitter = new QBoxLayout(QBoxLayout::LeftToRight);
     QPushButton *add = new QPushButton("Add new", this);
+    add->setMinimumHeight(40);
     QPushButton *close = new QPushButton("Close", this);
+    close->setMinimumHeight(40);
+    QPushButton *edit = new QPushButton("Edit", this);
+    edit->setMinimumHeight(40);
+    QPushButton *deleteBtn = new QPushButton("Delete", this);
+    deleteBtn->setMinimumHeight(40);
     rowSplitter->addWidget(add);
+    rowSplitter->addWidget(edit);
+    rowSplitter->addWidget(deleteBtn);
     rowSplitter->addWidget(close);
     windowLayout->addLayout(rowSplitter);
 
     connect(close, SIGNAL(clicked()), this, SLOT(closeWindow()));
-    connect(add, SIGNAL(clicked()), this, SLOT(addEvent()));
+    connect(add, SIGNAL(clicked()), this, SLOT(onAdd()));
+    connect(edit, SIGNAL(clicked()), this, SLOT(onEdit()));
+    connect(deleteBtn, SIGNAL(clicked()), this, SLOT(onDelete()));
+
 
     this->setLayout(windowLayout);
-    resize(QDesktopWidget().availableGeometry(this).size() * 0.15);
+    // Making window resize more nicely
+    this->resize(QDesktopWidget().availableGeometry(this).size() * 0.15);
+
 }
 
-
-bool EventsDialog::sortRule(const Event &ev1, const Event &ev2)
+int EventsDialog::getSelectedRow()
 {
-    if (ev1.time == ev2.time)
-    {
-        return ev1.description < ev2.description;
+    QModelIndexList selectedRows = this->eventsView.selectionModel()->selectedRows();
+
+    int row = -1;
+    for(QModelIndex modelIdx : selectedRows) {
+        row = modelIdx.row();
     }
-    return ev1.time < ev2.time;
+
+    return row;
 }
 
-void EventsDialog::addEvent()
+QModelIndex EventsDialog::getSelectedIndex()
 {
-    NewEventDialog *newEventDialog = new NewEventDialog(this->events, this->currentDate, this);
+    QModelIndexList selectedRows = this->eventsView.selectionModel()->selectedRows();
+    return selectedRows.value(0);
+}
+
+void EventsDialog::onAdd()
+{
+    NewEventDialog *newEventDialog = new NewEventDialog(this->model, this->currentDate, this);
 
     newEventDialog->setModal(true);
-    if(newEventDialog->exec())
-        this->renderEvents();
 
-}
-
-void EventsDialog::editEvent(int id)
-{
-    Event *editedEvent = new Event(this->events->value(id));
-    NewEventDialog *newEventDialog = new NewEventDialog(this->events, this->currentDate, this, editedEvent);
-
+    // Displaying dialog and if it accepts (the user didnt cancel) then we should rerender events since they was changed
     if(newEventDialog->exec())
     {
-        this->renderEvents();
-        delete editedEvent;
+        this->resized();
+        this->modelFiltered.sort(0);
     }
+}
 
+void EventsDialog::onEdit()
+{
+    int selectedRow = this->getSelectedRow();
+    if (selectedRow < 0)
+    {
+        QMessageBox::warning(this, "Choose event!", "Please, select event from the list to edit it.");
+        return;
+    }
+    QTime time = QModelIndex(this->modelFiltered.index(selectedRow, 0)).data().toTime();
+    QString desc = QModelIndex(this->modelFiltered.index(selectedRow, 1)).data().toString();
+    Event *edited = this->model->getEvent(Event(this->currentDate, time, desc));
+    NewEventDialog *newEventDialog = new NewEventDialog(this->model, this->currentDate, this, edited);
+    newEventDialog->setModal(true);
+    if (newEventDialog->exec())
+    {
+        this->modelFiltered.sort(0);
+    }
+}
+
+void EventsDialog::onDelete()
+{
+    int selectedRow = this->getSelectedRow();
+    if (selectedRow < 0)
+    {
+        QMessageBox::warning(this, "Choose event!", "Please, select event from the list to delete it.");
+        return;
+    }
+    QTime time = QModelIndex(this->modelFiltered.index(selectedRow, 0)).data().toTime();
+    QString desc = QModelIndex(this->modelFiltered.index(selectedRow, 1)).data().toString();
+    this->model->remove(Event(this->currentDate, time, desc));
+    this->resized();
 }
 
 void EventsDialog::closeWindow()
 {
     this->close();
 }
+
+//****  Author: Jan Radzimiński   **********************************
+//****  Index Number: 293052      **********************************

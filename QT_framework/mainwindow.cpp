@@ -1,15 +1,15 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QString>
-#include <QRegularExpression>
 #include <QDate>
-#include <QDebug>
 #include <QObject>
 #include <QDialog>
 #include <QFile>
 #include <QMessageBox>
-#include <QDialogButtonBox>
 #include <QSplitter>
+#include <QTextCharFormat>
+#include <QTableView>
+
 #include "event.h"
 #include "eventsdialog.h"
 
@@ -20,45 +20,103 @@ MainWindow::MainWindow(QWidget *parent)
     // Setting up UI
     ui->setupUi(this);
     this->setWindowTitle("Calendar");
-    this->buttonsInit();
 
     // Reading events from file
     this->readEventsFile();
 
-    // Setting current day
-    QDate *today = new QDate(QDate::currentDate());
-    today->setDate(today->year(), today->month(), 1);
-    this->currentDate = *today;
-    delete today;
+    // Styling calendar
+    this->calendarInit();
 
-    this->updateMonthLabel();
-    this->renderDays();
+    // Connecting calendar click on day to function invoking another dialog
+    connect(this->ui->calendar, SIGNAL(clicked(const QDate&)), this, SLOT(onDayClicked(const QDate&)));
 
-    // Connecting days to a event dialog controller
-    connect(&this->days, SIGNAL(buttonClicked(int)), this, SLOT(buttonWasClicked(int)));
+
 }
 
 MainWindow::~MainWindow()
 {
     // Saving events to the file data.txt (in build directory !!!)
     this->saveEventsFile();
+
     delete ui;
+}
+
+void MainWindow::calendarInit()
+{
+    // Coloring days with events and current day
+    this->updateDaysStyling();
+
+    // Aditional color styling for calendar widget made after checking implementation of this widget
+    // It may not work properly if implemtation is different - although it would result only in different colors so its
+    // just additional feature
+    QTableView *view = this->ui->calendar->findChild<QTableView*>("qt_calendar_calendarview");
+    if (view) {
+        QPalette pal = view->palette();
+        pal.setColor(QPalette::Base, Qt::white);
+        pal.setColor(QPalette::AlternateBase, "#e1f9e0");
+        view->setPalette(pal);
+    }
+
+    QWidget *calendarNavBar = this->ui->calendar->findChild<QWidget *>("qt_calendar_navigationbar");
+    if (calendarNavBar) {
+        QPalette pal = calendarNavBar->palette();
+        pal.setColor(calendarNavBar->backgroundRole(), "#27ae60");
+        pal.setColor(calendarNavBar->foregroundRole(), "#27ae60");
+        calendarNavBar->setPalette(pal);
+    }
+
+}
+
+void MainWindow::updateDaysStyling()
+{
+    // Reseting all days
+    this->ui->calendar->setDateTextFormat(QDate(), QTextCharFormat());
+
+    // Coloring current date
+    QTextCharFormat today;
+    today.setBackground(QBrush(QColor("#35b524")));
+
+    QTextCharFormat eventStyle;
+    eventStyle.setBackground(QBrush(QColor("#d5d9f2")));
+    // Coliorng days with events
+    for(int i = 0; i < this->model.rowCount(); i++)
+    {
+        if (this->model.getEvent(i)->getDate() == QDate::currentDate())
+        {
+            today.setBackground(QBrush(QColor("#b2bae8")));
+        }
+
+        this->ui->calendar->setDateTextFormat(this->model.getEvent(i)->getDate(), eventStyle);
+    }
+
+
+    today.setFontWeight(500);
+    this->ui->calendar->setDateTextFormat(QDate::currentDate(), today);
 }
 
 void MainWindow::readEventsFile()
 {
+    // Opening file for read
     QFile input("data.txt");
+
+    // If file does not exist
     if (!input.open(QFile::ReadOnly | QFile::Text))
     {
+        // Create this file
         QFile output("data.txt");
         if (!output.open(QFile::WriteOnly | QFile::Text))
         {
+            // If cannot create either throw warning - after that app will work notmally
             QMessageBox::warning(this, "title", "Could not read nor create data file. Make sure that program can operate on files if You want to save your events.");
             return;
         }
         output.close();
         return;
     }
+
+    // Reading events line by line
+    // Events are stored in format
+    // 00-00-0000,00:00,description\n
     while(!input.atEnd())
     {
         QString eventString = input.readLine();
@@ -68,173 +126,40 @@ void MainWindow::readEventsFile()
         const int hours = eventString.mid(11,2).toInt();
         const int minutes = eventString.mid(14,2).toInt();
         QString description = eventString.mid(17,(eventString.length() - 18));
-        Event newEvent = {QDate(year, month, day), QTime(hours, minutes), description};
-        this->events.push_back(newEvent);
+        Event newEvent(QDate(year, month, day), QTime(hours, minutes), description);
+
+        // Saving event in events vector
+        this->model.add(newEvent);
     }
     input.close();
 }
 
 void MainWindow::saveEventsFile()
 {
+    // At the close of application, it is saving events in a format described above to the data.txt file in program directory
+
     QFile output("data.txt");
     if (!output.open(QFile::WriteOnly | QFile::Text))
     {
         QMessageBox::warning(this, "title", "Could not write data file. No events were saved.");
         return;
     }
-    for (int i = 0; i < this->events.length(); i++)
+    for (int i = 0; i < this->model.rowCount(); i++)
     {
-        Event currEvent = this->events.value(i);
-        QString eventString = currEvent.date.toString("yyyy-MM-dd") + ",";
-        eventString += currEvent.time.toString("HH:mm") + "," + currEvent.description + "\n";
+        Event currEvent = *this->model.getEvent(i);
+        QString eventString = currEvent.getDate().toString("yyyy-MM-dd") + ",";
+        eventString += currEvent.getTime().toString("HH:mm") + "," + currEvent.getDescription() + "\n";
         output.write(eventString.toUtf8());
     }
     output.close();
 }
 
-
-void MainWindow::buttonsInit()
+void MainWindow::onDayClicked(const QDate &date)
 {
-    for (int i = 1; i <= 42; i++)
-    {
-        QString s = QString::number(i);
-        s = "day" + s;
-        QAbstractButton* button = this->findChild<QPushButton*>(s);
-        this->days.addButton(button, i);
-    }
-}
-
-void MainWindow::updateMonthLabel()
-{
-    QString monthName = this->currentDate.toString("MMMM yyyy");
-    monthName = monthName.toUpper();
-    this->findChild<QLabel*>("monthLabel")->setText(monthName);
-}
-
-void MainWindow::nextMonth() {
-    this->currentDate = this->currentDate.addMonths(1);
-    this->currentDate.setDate(this->currentDate.year(), this->currentDate.month(), 1);
-    this->updateMonthLabel();
-}
-
-void MainWindow::prevMonth() {
-    this->currentDate = this->currentDate.addMonths(-1);
-    this->currentDate.setDate(this->currentDate.year(), this->currentDate.month(), 1);
-    this->updateMonthLabel();
-}
-
-void MainWindow::renderDays()
-{
-    QDate *today = new QDate(this->currentDate);
-    const int currentWeekDay = today->dayOfWeek() - 1;
-    const int currentMonth = today->month();
-    *today = today->addDays(-currentWeekDay);
-
-    // Iterating through all buttons representing days and assigning proper number and styling to them
-    for (int i = 1; i <= 42; i++)
-    {
-        QAbstractButton* button = this->days.button(i);
-        QString s = QString::number(today->day());
-        button->setText(s);
-
-        if (today->month() != currentMonth)
-        {
-            button->setStyleSheet("* {background-color: white; color: gray; border-width: 0px;} *:hover{border-width: 1px;}");
-            // I used checkable proprty to mark days that belong to other month
-            button->setCheckable(false);
-            if (today->dayOfWeek() == 7)
-            {
-                button->setStyleSheet(button->styleSheet().append("* {color: #e29191}"));
-            }  else if (today->dayOfWeek() == 6)
-            {
-                button->setStyleSheet(button->styleSheet().append("* {color: #92c8e8}"));
-            }
-
-        } else
-        {
-            button->setStyleSheet("* {background-color: #F7F7F7; border-width: 1px; border-style: solid; border-color: #E6E6E6; color: black;} *:hover{ border-color: #B6B6B6;}");
-            button->setCheckable(true);
-
-            for (int j = 0; j < this->events.length(); j++)
-            {
-                if (this->events.value(j).date == *today)
-                {
-                    button->setStyleSheet(button->styleSheet().append("* {background-color: #C8CEF4;}"));
-                }
-            }
-
-            if (*today == QDate::currentDate())
-            {
-                button->setStyleSheet(button->styleSheet().append("* {border-color: red}"));
-            }
-            if (today->dayOfWeek() == 7)
-            {
-                button->setStyleSheet(button->styleSheet().append("* {color: red}"));
-            } else if (today->dayOfWeek() == 6)
-            {
-                button->setStyleSheet(button->styleSheet().append("* {color: #515de8}"));
-            }
-        }
-
-
-        *today = today->addDays(1);
-    }
-
-    delete today;
-}
-
-void MainWindow::on_nextMonth_clicked()
-{
-    this->nextMonth();
-    this->renderDays();
-}
-
-void MainWindow::on_prevMonth_clicked()
-{
-    this->prevMonth();
-    this->renderDays();
-}
-
-void MainWindow::buttonWasClicked(int buttonID)
-{
-    QAbstractButton *button = this->days.button(buttonID);
-    QString day = button->text();
-
-    // Changing the month if clicked button was not from current month
-    if (!button->isCheckable())
-    {
-        if (day.toInt() < 15) {
-            this->nextMonth();
-            button = this->days.button(buttonID - 7);
-            if (button->isCheckable()) {
-                if (buttonID > 35) button = this->days.button(buttonID - 35);
-                else button = this->days.button(buttonID - 28);
-
-            } else {
-                button = this->days.button(buttonID - 28);
-
-            }
-            this->renderDays();
-            if (!button->isCheckable()) button = this->days.button(buttonID - 28);
-        }
-        else {
-            this->prevMonth();
-            this->renderDays();
-            button = this->days.button(35 + buttonID);
-            if (!button->isCheckable()) button = this->days.button(28 + buttonID);
-        }
-
-
-    };
-
-    // Marking clicked day with light blue color to visualize which day events user is editing
-    button->setStyleSheet(button->styleSheet().append("* {background-color: #6ad8e2;}"));
-
-    QDate currentDate(this->currentDate.year(), this->currentDate.month(), day.toInt());
-
-    // Displaying dialog
-    EventsDialog eventDialog(&this->events, currentDate, this);
+    EventsDialog eventDialog(&this->model, date, this);
     eventDialog.exec();
-
-    this->renderDays();
+    this->updateDaysStyling();
 }
+
+//****  Author: Jan Radzimiński   **********************************
+//****  Index Number: 293052      **********************************

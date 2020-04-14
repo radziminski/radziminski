@@ -14,13 +14,31 @@
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>10</number>
+   </property>
+   <property name="topMargin">
+    <number>10</number>
+   </property>
+   <property name="rightMargin">
+    <number>10</number>
+   </property>
+   <property name="bottomMargin">
+    <number>10</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <property name="spacing">
+      <number>1</number>
+     </property>
      <item>
       <widget class="QLabel" name="label">
        <property name="minimumSize">
         <size>
-         <width>70</width>
+         <width>110</width>
          <height>0</height>
         </size>
        </property>
@@ -31,6 +49,12 @@
        </property>
        <property name="text">
         <string>Time:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>10</number>
        </property>
       </widget>
      </item>
@@ -51,17 +75,30 @@
          <height>30</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: white;
+border-color: #8e44ad;</string>
+       </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+     <property name="spacing">
+      <number>1</number>
+     </property>
      <item>
       <widget class="QLabel" name="label_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>110</width>
          <height>0</height>
         </size>
        </property>
@@ -73,21 +110,28 @@
        <property name="text">
         <string>Description:</string>
        </property>
+       <property name="margin">
+        <number>10</number>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QTextEdit" name="eventDesc">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>1</verstretch>
         </sizepolicy>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>80</height>
+         <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: white;
+border-color: #8e44ad;</string>
        </property>
       </widget>
      </item>
@@ -95,19 +139,33 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>7</number>
+     </property>
      <item>
       <widget class="QPushButton" name="saveBtn">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>70</height>
+         <height>80</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Save</string>
@@ -117,16 +175,27 @@
      <item>
       <widget class="QPushButton" name="cancelBtn">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>70</height>
+         <height>80</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>Cancel</string>

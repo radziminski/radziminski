@@ -13,7 +13,13 @@ namespace Calendar.Controllers
             ViewData["CurrDate"] = DateTime.Now.ToString("yyyy-MM-dd");
             if (this.RouteData.Values["id"] != null)
             {
-                ViewData["CurrDate"] = (string) this.RouteData.Values["id"];
+                string dateString = (string) this.RouteData.Values["id"];
+                DateTime? date = MyUtils.PareStringToDate(dateString);
+                if (date == null) 
+                {
+                    return View("~/Views/Home/Error.cshtml");
+                }
+                ViewData["CurrDate"] = date.Value.ToString("yyyy-MM-dd");
             }
 
             return View(events);

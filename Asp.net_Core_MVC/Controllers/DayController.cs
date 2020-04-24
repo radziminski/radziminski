@@ -9,14 +9,16 @@ namespace Calendar.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            string id = (string) this.RouteData.Values["id"];
-            int year = int.Parse(id.Substring(0, 4));
-            int month = int.Parse(id.Substring(5, 2));
-            int day = int.Parse(id.Substring(8, 2));
-            DateTime date = new DateTime(year, month, day);
-            EventsViewModel model = new EventsViewModel(date);
+            string dateString = (string) this.RouteData.Values["id"];
+            DateTime? date = MyUtils.PareStringToDate(dateString);
+            if (date == null) 
+            {
+                return View("~/Views/Home/Error.cshtml");
+            }
 
-            ViewData["Date"] = date.ToString("yyyy-MM-dd");
+            EventsViewModel model = new EventsViewModel(date.Value);
+
+            ViewData["Date"] = date.Value.ToString("yyyy-MM-dd");
             return View(model);
         }
 

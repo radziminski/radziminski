@@ -10,12 +10,13 @@ namespace Calendar.Controllers
         public IActionResult Index()
         {
             string dateString = (string) this.RouteData.Values["id"];
-            int year = int.Parse(dateString.Substring(0, 4));
-            int month = int.Parse(dateString.Substring(5, 2));
-            int day = int.Parse(dateString.Substring(8, 2));
-            DateTime date = new DateTime(year, month, day, 0, 0, 0);
+            DateTime? date = MyUtils.PareStringToDate(dateString);
+            if (date == null) 
+            {
+                return View("~/Views/Home/Error.cshtml");
+            }
 
-            EventEditorViewModel model = new EventEditorViewModel(date);
+            EventEditorViewModel model = new EventEditorViewModel(date.Value);
             return View(model);
         }
 
@@ -23,10 +24,11 @@ namespace Calendar.Controllers
         public IActionResult Edit()
         {
             string id = (string) this.RouteData.Values["id"];
+            if (id == null) return View("~/Views/Home/Error.cshtml");;
             EventsViewModel allEventsModel = new EventsViewModel();
             Event edited = allEventsModel.GetEventById(id);
 
-            if (edited == null) return new JsonResult(new { StatusCode = 500 });
+            if (edited == null) return View("~/Views/Home/Error.cshtml");
 
             EventEditorViewModel model = new EventEditorViewModel(edited.Id, edited.Date, edited.Description);
       

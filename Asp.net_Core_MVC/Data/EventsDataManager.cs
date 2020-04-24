@@ -21,10 +21,14 @@ namespace Calendar.Controllers
                         try
                         {
                             int GUIDLength = 32;
+                            if (line.Length < GUIDLength + 17) {
+                                 Console.WriteLine("There was an error while processing database. Events might have not been loaded properly");
+                                continue;
+                            }
                             string id = line.Substring(0, GUIDLength);
                             string date = line.Substring(GUIDLength + 1, 10);
                             string time = line.Substring(GUIDLength + 12, 5);
-                            string description = line.Substring(GUIDLength + 18, line.Length - (GUIDLength + 18));
+                            string description = line.Substring(GUIDLength + 18, line.Length - (GUIDLength + 18)).Replace("@endl;", "\n");
                             DateTime eventDate = DateStringToDateTime(date, time);
 
                             Event newEvent = new Event() { Id = id, Date = eventDate, Description = description };
@@ -56,7 +60,14 @@ namespace Calendar.Controllers
                 {
                     foreach(Event ev in Events)
                     {
-                        sw.WriteLine(ev.Id + ',' + ev.Date.ToString("yyyy-MM-dd") + ',' + ev.Date.ToString("HH:mm") + ',' + ev.Description);
+                        if (ev == null) {
+                            Console.Write("There was a problem while saving events file, events might not have been saved properly.");
+                            continue;
+                        }
+                        string description = "";
+                        if (ev.Description != null)
+                            description = ev.Description.Replace("\n", "@endl;");
+                        sw.WriteLine(ev.Id + ',' + ev.Date.ToString("yyyy-MM-dd") + ',' + ev.Date.ToString("HH:mm") + ',' + description);
                     }
                 }
                 return true;

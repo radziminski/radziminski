@@ -1,7 +1,7 @@
 # Graphical User Interfaces Project
 Simple calendar application made for graphical user interfaces (EGUI) course laboratories in 3 different technologies (QT Framework, ASP.NET Core and React).
 
-## Task
+## Project Description
 The task was to:
   - Write simple Calendar application using given technology (under linux) having three simple screens
   - Data should be stored in text file (format to be designed by the student)

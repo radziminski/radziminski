@@ -1,0 +1,81 @@
+﻿@model Calendar.Models.EventEditorViewModel
+@{
+    ViewData["Date"] = Model.Date.ToString("yyyy-MM-dd");
+    ViewData["Title"] = "Adding new event on";
+    ViewData["BtnText"] = "Add Event";
+    ViewData["HttpReq"] = "POST";
+    ViewData["Url"] = "/event/add/";
+
+    if (Model.Edited)
+    {
+        ViewData["Title"] = "Editing event on";
+        ViewData["BtnText"] = "Update Event";
+        ViewData["HttpReq"] = "PUT";
+        ViewData["Url"] = "/event/update/" + Model.Id;
+    }
+}
+
+
+<div class="day js--event" id="@ViewData["Date"]">
+    <h1 class="title">@ViewData["Title"] @ViewData["Date"]</h1>
+    <form class="js--form">
+        <div class="form-box">
+            <div style="margin-bottom: 2rem">
+                <input id="timepicker" width="276" value="@Model.Date.ToString("HH:mm")" readonly />
+
+            </div>
+
+
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Description</label>
+                <textarea class="form-control u-normal-font js--desc" id="exampleFormControlTextarea1" rows="3">@Model.Description</textarea>
+            </div>
+        </div>
+
+        <div class="day__btns">
+            <button type="submit" class="btn btn-success myBtn">@ViewData["BtnText"]</button>
+            <a href="/day/index/@ViewData["Date"]" class="btn btn-danger myBtn">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $('document').ready(function () {
+            $('#timepicker').timepicker({
+                uiLibrary: 'bootstrap4'
+            });
+
+            $('.js--form').submit(function (e) {
+                e.preventDefault();
+                var year = @Model.Date.Year;
+                var month = @Model.Date.Month;
+                var day = @Model.Date.Day;
+                var time = $('#timepicker').val();
+                var hours = time.slice(0, 2);
+                var minutes = time.slice(3, 5);
+                var description = $('.js--desc').val();
+                console.log('Sending: ', hours, minutes, description);
+                $.ajax({
+                    type: '@ViewData["HttpReq"]',
+                    url: '@ViewData["Url"]',
+                    data: {
+                        Year: year,
+                        Month: month,
+                        Day: day,
+                        Hours: hours,
+                        Minutes: minutes,
+                        Description: description
+                    },
+                    success: function (data) {
+                        window.location.href = '/day/index/@ViewData["Date"]';
+                    },
+                    error: function (error) {
+                        alert('Sorry, something went wrong - events were not updated. Please reload the page and try again.');
+                    }
+                })
+            });
+        })
+
+    </script>
+}

@@ -1,0 +1,44 @@
+﻿@model Calendar.Models.EventsViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="calendar-box">
+    <div id="calendar"></div>
+</div>
+
+@section Scripts {
+    <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            header: {
+                left: 'prev, today',
+                center: 'title',
+                right: 'next'
+            },
+            events: [
+                @foreach (Event ev in Model.GetAllEvents())
+                {
+                    <text>{
+                    start: '@ev.Date.Date.ToString("yyyy/MM/dd").Replace('.', '-')',
+                    end: '@ev.Date.Date.ToString("yyyy/MM/dd").Replace('.', '-')',
+                    rendering: 'background'
+                            },</text>
+                }
+            ],
+            dateClick: function (info) {
+                window.location.href = '/day/index/' + info.dateStr;
+            },
+            editable: true,
+            eventLimit: true,
+            plugins: ['dayGrid', 'interaction']
+        });
+        calendar.gotoDate('@ViewData["CurrDate"]');
+        calendar.render();
+    });
+
+    </script>
+}

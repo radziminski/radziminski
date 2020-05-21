@@ -1,0 +1,32 @@
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: white;
+    font-size: 62.5%;
+}
+
+a,
+a:link,
+a:visited {
+    text-decoration: none;
+    color: inherit;
+    font-size: inherit;
+}
+
+button {
+    text-decoration: none;
+    color: inherit;
+    font: inherit;
+    color: inherit;
+    background-color: inherit;
+}
+
+ul {
+    list-style: none;
+}

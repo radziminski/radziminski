@@ -1,3 +1,6 @@
-/Asp.net_Core_MVC/bin
-/Asp.net_Core_MVC/obj
+/Asp.NET/bin
+/Asp.NET/obj
+/React.js/development/frontend/node_modules
+/React.js/development/backend/bin
+/React.js/development/backend/obj
 

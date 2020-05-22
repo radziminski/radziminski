@@ -1,42 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import './assets/scss/main.scss';
+import React from 'react';
+//import './assets/scss/main.scss';
+import './assets/css/style.css';
 import Home from './views/Home';
 import Event from './views/Event';
 import Day from './views/Day';
 import Footer from './views/Footer';
 import axios from 'axios';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
+////////////////////////////////////////////
+//////// CREATED BY JAN RADZIMINSKI ////////
+////////////////////////////////////////////
+
+// AXIOS CONFIG
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.baseURL = 'http://localhost:3000/';
 
+// App Render
 const App = () => {
-    const [currView, setCurrView] = useState('home');
-    const [currDate, setCurrDate] = useState(new Date());
-
-    const toggleView = (viewName, date) => {
-        setCurrView(viewName);
-        setCurrDate(date);
-    };
-
-    let renderView;
-    switch (currView) {
-        case 'home':
-            renderView = <Home switchView={toggleView} currDate={currDate} />;
-            break;
-        case 'day':
-            renderView = <Day switchView={toggleView} currDate={currDate} />;
-            break;
-        case 'event':
-            renderView = <Event switchView={toggleView} currDate={currDate} />;
-            break;
-        default:
-            renderView = <Home switchView={toggleView} currDate={currDate} />;
-            break;
-    }
     return (
-        <div className="App">
-            {renderView}
-            <Footer />
-        </div>
+        <Router>
+            <div className="App">
+                <Switch>
+                    <Route path="/day/:date" component={Day} />
+                    <Route path="/event/:date/:id?" component={Event} />
+                    <Route path="/home/:date?" component={Home} />
+                    <Route path="/" component={Home} />
+                </Switch>
+                <Footer />
+            </div>
+        </Router>
     );
 };
 

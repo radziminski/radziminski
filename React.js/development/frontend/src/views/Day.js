@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { dateToString } from '../utils';
+import axios from 'axios';
+import { withRouter } from 'react-router-dom';
+import { dateToString, digitToTwoCharString } from '../utils';
 import EventCard from '../components/EventCard';
 import Button from '../components/Button';
-import { digitToTwoCharString } from '../utils';
-import axios from 'axios';
+import SectionTitle from '../components/SectionTitle';
 
 const Day = (props) => {
-    const [events, setEvents] = useState([]);
+    // Route Params
+    const currDate = new Date(props.match.params.date * 1);
 
+    // State
+    const [events, setEvents] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Getting events for given day from server
     const getEventsFromCurrDate = () => {
-        const reqUrl = `http://localhost:3000/api/events/${props.currDate.getFullYear()}-${digitToTwoCharString(
-            props.currDate.getMonth() + 1
-        )}-${digitToTwoCharString(props.currDate.getDate())}/`;
-        console.log(reqUrl);
+        const reqUrl = `/api/events/${currDate.getFullYear()}-${digitToTwoCharString(
+            currDate.getMonth() + 1
+        )}-${digitToTwoCharString(currDate.getDate())}/`;
 
         axios
             .get(reqUrl)
@@ -27,24 +33,49 @@ const Day = (props) => {
                     };
                 });
                 setEvents(events);
+                setIsLoading(false);
+            })
+            .catch((err) => {
+                alert(
+                    'Sorry, something went wrong while connecting to server. Please make sure that the server is properly running.'
+                );
+                setIsLoading(false);
+                props.history.push('/home');
             });
     };
 
+    // Getting events as component mounts
     useEffect(() => {
         getEventsFromCurrDate();
+        // disablaing message since its a method used in other places too
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const deleteEvent = (id) => {
-        const reqUrl = `http://localhost:3000/api/deleteevent/${id}`;
-        axios.delete(reqUrl).then((data) => {
-            console.log(data);
-            getEventsFromCurrDate();
-        });
+        const reqUrl = `/api/deleteevent/${id}`;
+        setIsLoading(true);
+        axios
+            .delete(reqUrl)
+            .then((data) => {
+                setIsLoading(false);
+                getEventsFromCurrDate();
+            })
+            .catch((err) => {
+                alert(
+                    'Sorry, something went wrong delete request. Please make sure that the server is properly running.'
+                );
+                setIsLoading(false);
+                props.history.push('/home');
+            });
     };
 
-    const { switchView, currDate } = props;
+    // In case there are no events proper message is displayed
     let renderedEvents = <div className="day-view__msg">There are no events on this day.</div>;
 
+    // In case server fetch is in progress
+    if (isLoading) renderedEvents = <div>Loading...</div>;
+
+    // In case there are some events, they are mapped into event cards
     if (events.length > 0)
         renderedEvents = events.map((el, i) => (
             <EventCard
@@ -53,16 +84,23 @@ const Day = (props) => {
                 date={el.date}
                 description={el.description}
                 onDelete={deleteEvent}
+                onEdit={() => props.history.push(`/event/${el.date.getTime()}/${el.id}`)}
             />
         ));
 
     return (
         <section className="day-view">
-            <h1 className="section-title">Events on {dateToString(currDate)}</h1>
+            <SectionTitle>Events on {dateToString(currDate)}</SectionTitle>
+
             <div className="day-view__events-box">{renderedEvents}</div>
             <div className="day-view__btns">
-                <Button onClick={() => switchView('event', currDate)}>Add New</Button>
-                <Button classTypes={['red']} onClick={() => switchView('home', currDate)}>
+                <Button onClick={() => props.history.push(`/event/${currDate.getTime()}`)}>
+                    Add New
+                </Button>
+                <Button
+                    classTypes={['red']}
+                    onClick={() => props.history.push(`/home/${currDate.getTime()}`)}
+                >
                     Back
                 </Button>
             </div>
@@ -70,4 +108,4 @@ const Day = (props) => {
     );
 };
 
-export default Day;
+export default withRouter(Day);

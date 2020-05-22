@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { getMonthStringFromDate, addDaysToDate, compareDates } from '../utils';
-import { IoIosArrowDropleft, IoIosArrowDropright } from 'react-icons/io';
 import axios from 'axios';
+import { withRouter } from 'react-router-dom';
+import Day from './DayCell';
+import Navbar from './Navbar';
+
+const weekDays = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export const Calendar = (props) => {
-    const [currDate, setCurrDate] = useState(props.currDate);
+    // If user goes back from not current month
+    const defaultDate = props.match.params.date
+        ? new Date(props.match.params.date * 1) // * 1 used to convert to int
+        : new Date();
+
+    // State
+    const [currDate, setCurrDate] = useState(defaultDate);
     const [daysWithEvents, setDaysWithEvents] = useState([]);
 
+    // Getting all events once after component mounts
     useEffect(() => {
         axios
-            .get('http://localhost:3000/api/events')
+            .get('/api/events')
             .then((data) => data.data.data)
-            .then((data) => JSON.parse(data))
+            .then((data) => JSON.parse(data)) // data comes in serialized json
             .then((data) => {
                 const events = data.map((el) => {
                     return {
@@ -24,42 +35,53 @@ export const Calendar = (props) => {
             });
     }, []);
 
+    // Function creating days visible in given month
     const generateDays = (events = []) => {
         const days = [];
         const date = new Date(currDate);
         date.setDate(1);
+
         // Starting from some days from previous month:
         while (date.getDay() !== 1) date.setDate(date.getDate() - 1);
 
         // Generating the days:
         const daysRows = 6;
         const daysInWeek = 7;
-
         let dayCounter = 0;
         while (dayCounter < daysRows * daysInWeek) {
+            // Adding hasEvent flag to know if daay needs to be blue
             let hasEvent = false;
-
             if (events.find((el) => compareDates(el.date, date))) hasEvent = true;
 
             days.push({
                 date: date.getDate(),
                 active: date.getMonth() === currDate.getMonth(),
                 event: hasEvent,
+                today: compareDates(date, new Date()),
+                sunday: date.getDay() === 0,
             });
+
+            // Moving to next day
             addDaysToDate(date, 1);
             dayCounter++;
         }
         return days;
     };
 
+    // If days is clicked going to day view
     const onDayClicked = (e) => {
+        // Defining date
         const day = e.target.innerText;
         let month = currDate.getMonth();
         let year = currDate.getFullYear();
+
+        // Cases where date from other month was clicked
         if (e.target.getAttribute('data-isactive') === 'false') {
             if (day > 20) month--;
             else month++;
         }
+
+        // Cases where date from other year was clicked
         if (month > 11) {
             month = 0;
             year++;
@@ -69,12 +91,16 @@ export const Calendar = (props) => {
             year--;
         }
 
-        props.switchView('day', new Date(year, month, day));
+        // Switching view with React Router
+        props.history.push(`/day/${new Date(year, month, day).getTime()}`);
     };
 
+    // Handling if month has been changed by arrow on navbar
     const onMonthChanged = (offset) => {
         const date = new Date(currDate);
         let newMonth = date.getMonth() + offset;
+
+        // Handling if year was changed
         if (newMonth > 11) {
             newMonth = 0;
             date.setFullYear(date.getFullYear() + 1);
@@ -88,33 +114,37 @@ export const Calendar = (props) => {
         setCurrDate(date);
     };
 
-    const days = generateDays(daysWithEvents).map(({ date, active, event }, i) => (
-        <div
+    // Creating days DOM elements
+    const days = generateDays(daysWithEvents).map(({ date, active, event, today, sunday }, i) => (
+        <Day
             key={i}
             className={`calendar__day ${!active ? 'calendar__day--ghost' : ''} ${
                 event ? 'calendar__day--event' : ''
-            }`}
+            } ${today ? 'calendar__day--today' : ''} ${sunday ? 'calendar__day--red' : ''}`}
             onClick={onDayClicked}
-            data-isactive={active}
+            active={active}
         >
             {date}
-        </div>
+        </Day>
     ));
 
     return (
         <div className="calendar">
-            <div className="calendar__navbar">
-                <div className="calendar__arrow" onClick={() => onMonthChanged(-1)}>
-                    <IoIosArrowDropleft className="calendar__icon" />
-                </div>
-                <h1 className="calendar__title">{getMonthStringFromDate(currDate)}</h1>
-                <div className="calendar__arrow" onClick={() => onMonthChanged(1)}>
-                    <IoIosArrowDropright className="calendar__icon" />
-                </div>
-            </div>
+            <Navbar
+                onLeftClick={() => onMonthChanged(-1)}
+                onRightClick={() => onMonthChanged(1)}
+                title={getMonthStringFromDate(currDate)}
+            />
+            <ul className="calendar__week-days">
+                {weekDays.map((el, id) => (
+                    <li key={id} className="calendar__week-day">
+                        {el}
+                    </li>
+                ))}
+            </ul>
             <div className="calendar__days-box">{days}</div>
         </div>
     );
 };
 
-export default Calendar;
+export default withRouter(Calendar);

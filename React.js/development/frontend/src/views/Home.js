@@ -1,10 +1,10 @@
 import React from 'react';
 import Calendar from '../components/Calendar';
 
-const Home = ({ switchView, currDate }) => {
+const Home = () => {
     return (
         <section className="home-view">
-            <Calendar currDate={currDate} switchView={switchView} />
+            <Calendar />
         </section>
     );
 };

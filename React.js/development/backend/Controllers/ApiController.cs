@@ -43,11 +43,31 @@ namespace Calendar.Controllers
             // getting all events
             EventsViewModel eventsModel = new EventsViewModel();
             List<Event> events = eventsModel.GetAllEvents();
-            String x = JsonSerializer.Serialize(events);
+            String result = JsonSerializer.Serialize(events);
             return new JsonResult(new
             {
                 status = "success",
-                data = x
+                data = result
+            });
+        }
+
+        [HttpGet]
+        public JsonResult Event()
+        {
+            if (this.RouteData.Values["id"] == null)
+            {
+                return new JsonResult(new
+                {
+                    status = "error"
+                });
+            }
+            EventsViewModel model = new EventsViewModel();
+            Event ev = model.GetEventById(this.RouteData.Values["id"].ToString());
+            String result = JsonSerializer.Serialize(ev);
+            return new JsonResult(new
+            {
+                status = "success",
+                data = result
             });
         }
 
@@ -55,7 +75,6 @@ namespace Calendar.Controllers
         public JsonResult UpdateEvent(int Year, int Month, int Day, int Hours, int Minutes, string Description)
         {
             string id = (string)this.RouteData.Values["id"];
-            Console.WriteLine("Updating: " + id);
             EventsViewModel model = new EventsViewModel();
             if (model.UpdateEvent(id, new DateTime(Year, Month, Day, Hours, Minutes, 0), Description))
                 return new JsonResult(new
@@ -74,7 +93,6 @@ namespace Calendar.Controllers
         [HttpPost]
         public JsonResult AddEvent(int Year, int Month, int Day, int Hours, int Minutes, string Description)
         {
-            Console.WriteLine(Year.ToString() + Month.ToString() + Day.ToString() + Hours.ToString() + Minutes.ToString() + Description);
             EventsViewModel model = new EventsViewModel();
             model.AddEvent(new DateTime(Year, Month, Day, Hours, Minutes, 0), Description);
 

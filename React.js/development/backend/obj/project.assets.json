@@ -6177,11 +6177,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/janek/Desktop/EGUI/lab3/calendar/development/backend/Calendar.csproj",
+      "projectUniqueName": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/Calendar.csproj",
       "projectName": "Calendar",
-      "projectPath": "/home/janek/Desktop/EGUI/lab3/calendar/development/backend/Calendar.csproj",
+      "projectPath": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/Calendar.csproj",
       "packagesPath": "/home/janek/.nuget/packages/",
-      "outputPath": "/home/janek/Desktop/EGUI/lab3/calendar/development/backend/obj/",
+      "outputPath": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/janek/.nuget/NuGet/NuGet.Config"

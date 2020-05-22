@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
-import { getMonthStringFromDate, addDaysToDate } from '../utils';
+import React, { useState, useEffect } from 'react';
+import { getMonthStringFromDate, addDaysToDate, compareDates } from '../utils';
 import { IoIosArrowDropleft, IoIosArrowDropright } from 'react-icons/io';
+import axios from 'axios';
 
 export const Calendar = (props) => {
     const [currDate, setCurrDate] = useState(props.currDate);
     const [daysWithEvents, setDaysWithEvents] = useState([]);
 
-    const generateDays = () => {
+    useEffect(() => {
+        axios
+            .get('http://localhost:3000/api/events')
+            .then((data) => data.data.data)
+            .then((data) => JSON.parse(data))
+            .then((data) => {
+                const events = data.map((el) => {
+                    return {
+                        id: el.Id,
+                        description: el.Description,
+                        date: new Date(el.Date),
+                    };
+                });
+                setDaysWithEvents(events);
+            });
+    }, []);
+
+    const generateDays = (events = []) => {
         const days = [];
         const date = new Date(currDate);
         date.setDate(1);
@@ -19,9 +37,14 @@ export const Calendar = (props) => {
 
         let dayCounter = 0;
         while (dayCounter < daysRows * daysInWeek) {
+            let hasEvent = false;
+
+            if (events.find((el) => compareDates(el.date, date))) hasEvent = true;
+
             days.push({
                 date: date.getDate(),
                 active: date.getMonth() === currDate.getMonth(),
+                event: hasEvent,
             });
             addDaysToDate(date, 1);
             dayCounter++;
@@ -31,13 +54,22 @@ export const Calendar = (props) => {
 
     const onDayClicked = (e) => {
         const day = e.target.innerText;
-        const date = currDate;
-        date.setDate(day);
-        if (e.target.classList.length > 1) {
-            if (day > 20) date.setMonth(date.getMonth() - 1);
-            else date.setMonth(date.getMonth() + 1);
+        let month = currDate.getMonth();
+        let year = currDate.getFullYear();
+        if (e.target.getAttribute('data-isactive') === 'false') {
+            if (day > 20) month--;
+            else month++;
         }
-        props.switchView('day', date);
+        if (month > 11) {
+            month = 0;
+            year++;
+        }
+        if (month < 0) {
+            month = 11;
+            year--;
+        }
+
+        props.switchView('day', new Date(year, month, day));
     };
 
     const onMonthChanged = (offset) => {
@@ -56,11 +88,14 @@ export const Calendar = (props) => {
         setCurrDate(date);
     };
 
-    const days = generateDays(currDate).map(({ date, active }, i) => (
+    const days = generateDays(daysWithEvents).map(({ date, active, event }, i) => (
         <div
             key={i}
-            className={`calendar__day ${!active ? 'calendar__day--ghost' : ''}`}
+            className={`calendar__day ${!active ? 'calendar__day--ghost' : ''} ${
+                event ? 'calendar__day--event' : ''
+            }`}
             onClick={onDayClicked}
+            data-isactive={active}
         >
             {date}
         </div>

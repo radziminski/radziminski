@@ -58,16 +58,35 @@ namespace Calendar.Controllers
             Console.WriteLine("Updating: " + id);
             EventsViewModel model = new EventsViewModel();
             if (model.UpdateEvent(id, new DateTime(Year, Month, Day, Hours, Minutes, 0), Description))
-                return new JsonResult(new { StatusCode = 201 });
-            return new JsonResult(new { StatusCode = 400 });
+                return new JsonResult(new
+                {
+                    status = "success",
+                    data = new
+                    {
+                        Id = id,
+                        Date = new DateTime(Year, Month, Day, Hours, Minutes, 0),
+                        Description = Description
+                    }
+                });
+            return new JsonResult(new { status = "error" });
         }
 
         [HttpPost]
         public JsonResult AddEvent(int Year, int Month, int Day, int Hours, int Minutes, string Description)
         {
+            Console.WriteLine(Year.ToString() + Month.ToString() + Day.ToString() + Hours.ToString() + Minutes.ToString() + Description);
             EventsViewModel model = new EventsViewModel();
             model.AddEvent(new DateTime(Year, Month, Day, Hours, Minutes, 0), Description);
-            return new JsonResult(new { StatusCode = 201 });
+
+            return new JsonResult(new
+            {
+                status = "success",
+                data = new
+                {
+                    Date = new DateTime(Year, Month, Day, Hours, Minutes, 0),
+                    Description = Description
+                }
+            });
         }
 
         [HttpDelete]
@@ -77,8 +96,8 @@ namespace Calendar.Controllers
             EventsViewModel model = new EventsViewModel();
             bool status = model.RemoveEventById(id);
             if (status)
-                return new JsonResult(new { StatusCode = 204 });
-            return new JsonResult(new { StatusCode = 400 });
+                return new JsonResult(new { });
+            return new JsonResult(new { status = "error" });
         }
 
         public IActionResult Error()

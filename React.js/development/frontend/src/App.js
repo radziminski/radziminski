@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './assets/scss/main.scss';
 import Home from './views/Home';
 import Event from './views/Event';
 import Day from './views/Day';
 import Footer from './views/Footer';
+import axios from 'axios';
+
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 const App = () => {
     const [currView, setCurrView] = useState('home');

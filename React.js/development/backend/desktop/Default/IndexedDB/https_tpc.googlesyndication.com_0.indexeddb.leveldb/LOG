@@ -1,0 +1,15 @@
+2020/05/22-13:39:49.893 50d3 Reusing MANIFEST /home/janek/Desktop/EGUI/gui-course/React.js/development/backend/desktop/Default/IndexedDB/https_tpc.googlesyndication.com_0.indexeddb.leveldb/MANIFEST-000001
+2020/05/22-13:39:49.895 50d3 Recovering log #4
+2020/05/22-13:39:49.895 50d3 Reusing old log /home/janek/Desktop/EGUI/gui-course/React.js/development/backend/desktop/Default/IndexedDB/https_tpc.googlesyndication.com_0.indexeddb.leveldb/000004.log 
+2020/05/22-13:40:13.255 1fa9 Level-0 table #8: started
+2020/05/22-13:40:13.260 1fa9 Level-0 table #8: 190 bytes OK
+2020/05/22-13:40:13.264 1fa9 Delete type=0 #4
+2020/05/22-13:40:13.265 1fa9 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
+2020/05/22-13:40:13.266 1fa9 Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x00\x00\x00\x05' @ 9 : 1
+2020/05/22-13:40:13.266 1fa9 Compacting 1@1 + 1@2 files
+2020/05/22-13:40:13.269 1fa9 Generated table #9@1: 8 keys, 368 bytes
+2020/05/22-13:40:13.269 1fa9 Compacted 1@1 + 1@2 files => 368 bytes
+2020/05/22-13:40:13.271 1fa9 compacted to: files[ 0 0 1 0 0 0 0 ]
+2020/05/22-13:40:13.272 1fa9 Delete type=2 #8
+2020/05/22-13:40:13.272 1fa9 Delete type=2 #5
+2020/05/22-13:40:13.272 1fa9 Manual compaction at level-1 from '\x00\x00\x00\x00\x05' @ 9 : 1 .. (end); will stop at (end)

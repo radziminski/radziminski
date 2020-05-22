@@ -24,8 +24,18 @@ export const addDaysToDate = (date, daysAmount) => {
     date.setDate(date.getDate() + daysAmount);
 };
 
-export const timeToString = (time) => {
+export const digitToTwoCharString = (time) => {
     let timeString = time.toString();
     if (timeString.length === 1) return '0' + timeString;
     return timeString;
+};
+
+export const compareDates = (dateA, dateB) => {
+    if (
+        dateA.getDate() !== dateB.getDate() ||
+        dateA.getMonth() !== dateB.getMonth() ||
+        dateA.getFullYear() !== dateB.getFullYear()
+    )
+        return false;
+    return true;
 };

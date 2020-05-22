@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "d4aQOfVaOdURcV60PRcArw2RRssT/UVTPoulKFeQSZU1CwkibqI1pED0B+TyoYWJWoRXT6sMM1IkCZxrnb2qNg==",
+  "dgSpecHash": "KzZ0495EVW7kuDmWB2wb9aGC2exS8GYL18KWe3iNOqkYmHAIGoDtnOhE0MxZIdakv2c8MpYXWuN2DReJyzcpXg==",
   "success": true,
-  "projectFilePath": "/home/janek/Desktop/EGUI/lab3/calendar/development/backend/Calendar.csproj",
+  "projectFilePath": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/Calendar.csproj",
   "expectedPackageFiles": [
     "/home/janek/.nuget/packages/microsoft.aspnetcore.html.abstractions/2.2.0/microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
     "/home/janek/.nuget/packages/microsoft.aspnetcore.razor/2.2.0/microsoft.aspnetcore.razor.2.2.0.nupkg.sha512",

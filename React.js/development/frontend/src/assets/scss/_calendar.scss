@@ -42,9 +42,21 @@
         cursor: pointer;
         border-top: 1px solid rgba(0, 0, 0, 0.2);
         border-left: 1px solid rgba(0, 0, 0, 0.2);
+        transition: all 0.08s;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
 
         &--ghost {
             color: grey;
+        }
+
+        &--event {
+            background-color: rgba($color-primary, 0.25);
+            &:hover {
+                background-color: rgba($color-primary, 0.3);
+            }
         }
     }
 

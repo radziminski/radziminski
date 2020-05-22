@@ -20531,23 +20531,8 @@
       "FileKind": "mvc"
     },
     {
-      "FilePath": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/Views/Event/Index.cshtml",
-      "TargetPath": "Views\\Event\\Index.cshtml",
-      "FileKind": "mvc"
-    },
-    {
       "FilePath": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/Views/Home/Index.cshtml",
       "TargetPath": "Views\\Home\\Index.cshtml",
-      "FileKind": "mvc"
-    },
-    {
-      "FilePath": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/Views/Day/Index.cshtml",
-      "TargetPath": "Views\\Day\\Index.cshtml",
-      "FileKind": "mvc"
-    },
-    {
-      "FilePath": "/home/janek/Desktop/EGUI/gui-course/React.js/development/backend/Views/Shared/_Layout.cshtml",
-      "TargetPath": "Views\\Shared\\_Layout.cshtml",
       "FileKind": "mvc"
     },
     {

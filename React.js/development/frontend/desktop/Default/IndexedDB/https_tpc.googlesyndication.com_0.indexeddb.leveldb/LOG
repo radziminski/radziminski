@@ -1,8 +1,0 @@
-2020/05/22-17:40:08.745 3b3c Reusing MANIFEST /home/janek/Desktop/EGUI/gui-course/React.js/development/frontend/desktop/Default/IndexedDB/https_tpc.googlesyndication.com_0.indexeddb.leveldb/MANIFEST-000001
-2020/05/22-17:40:08.745 3b3c Recovering log #16
-2020/05/22-17:40:08.745 3b3c Reusing old log /home/janek/Desktop/EGUI/gui-course/React.js/development/frontend/desktop/Default/IndexedDB/https_tpc.googlesyndication.com_0.indexeddb.leveldb/000016.log 
-2020/05/22-17:40:18.043 6106 Level-0 table #21: started
-2020/05/22-17:40:18.043 6106 Level-0 table #21: 0 bytes OK
-2020/05/22-17:40:18.046 6106 Delete type=0 #16
-2020/05/22-17:40:18.046 6106 Manual compaction at level-0 from (begin) .. (end); will stop at (end)
-2020/05/22-17:40:18.046 6106 Manual compaction at level-1 from (begin) .. (end); will stop at (end)

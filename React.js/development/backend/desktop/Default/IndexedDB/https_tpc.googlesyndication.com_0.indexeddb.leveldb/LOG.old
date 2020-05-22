@@ -1,5 +1,0 @@
-2020/05/22-11:59:05.949 1ec4 Reusing MANIFEST /home/janek/Desktop/EGUI/gui-course/React.js/development/backend/desktop/Default/IndexedDB/https_tpc.googlesyndication.com_0.indexeddb.leveldb/MANIFEST-000001
-2020/05/22-11:59:14.291 1fa9 Level-0 table #5: started
-2020/05/22-11:59:14.295 1fa9 Level-0 table #5: 360 bytes OK
-2020/05/22-11:59:14.299 1fa9 Delete type=0 #3
-2020/05/22-11:59:14.299 1fa9 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

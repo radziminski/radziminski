@@ -1,5 +1,0 @@
-2020/05/22-16:09:12.174 68fc Reusing MANIFEST /home/janek/Desktop/EGUI/gui-course/React.js/development/frontend/desktop/Default/IndexedDB/https_learnwithparam.com_0.indexeddb.leveldb/MANIFEST-000001
-2020/05/22-16:09:45.379 6106 Level-0 table #5: started
-2020/05/22-16:09:45.386 6106 Level-0 table #5: 3283 bytes OK
-2020/05/22-16:09:45.389 6106 Delete type=0 #3
-2020/05/22-16:09:45.389 6106 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

@@ -1,6 +1,0 @@
-2020/05/22-14:45:46.212 1de8 Reusing MANIFEST /home/janek/Desktop/EGUI/gui-course/React.js/development/frontend/desktop/Default/Local Storage/leveldb/MANIFEST-000001
-2020/05/22-14:45:46.212 1de8 Recovering log #3
-2020/05/22-14:45:46.212 1de8 Reusing old log /home/janek/Desktop/EGUI/gui-course/React.js/development/frontend/desktop/Default/Local Storage/leveldb/000003.log 
-2020/05/22-15:31:30.171 48fc Level-0 table #5: started
-2020/05/22-15:31:30.176 48fc Level-0 table #5: 32103 bytes OK
-2020/05/22-15:31:30.180 48fc Delete type=0 #3

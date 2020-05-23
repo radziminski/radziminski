@@ -1,5 +1,4 @@
 import React from 'react';
-//import './assets/scss/main.scss';
 import './assets/css/style.css';
 import Home from './views/Home';
 import Event from './views/Event';

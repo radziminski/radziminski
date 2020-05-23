@@ -32,7 +32,18 @@ export const Calendar = (props) => {
                     };
                 });
                 setDaysWithEvents(events);
+            })
+            .catch((err) => {
+                if (props.match.params.date)
+                    console.error('Could not connect to the server.\n', err);
+                else
+                    alert(
+                        'Sorry, something went wrong while connecting to server. Please make sure that the server is properly running.\n' +
+                            err
+                    );
             });
+        // disablaing message since its a method used in other places too
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Function creating days visible in given month
@@ -133,7 +144,7 @@ export const Calendar = (props) => {
             <Navbar
                 onLeftClick={() => onMonthChanged(-1)}
                 onRightClick={() => onMonthChanged(1)}
-                title={getMonthStringFromDate(currDate)}
+                title={`${getMonthStringFromDate(currDate)} ${currDate.getFullYear()}`}
             />
             <ul className="calendar__week-days">
                 {weekDays.map((el, id) => (

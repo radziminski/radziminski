@@ -37,10 +37,10 @@ const Day = (props) => {
             })
             .catch((err) => {
                 alert(
-                    'Sorry, something went wrong while connecting to server. Please make sure that the server is properly running.'
+                    'Sorry, something went wrong while connecting to server. Please make sure that the server is properly running.\n' +
+                        err
                 );
-                setIsLoading(false);
-                props.history.push('/home');
+                props.history.push(`/home/${currDate.getTime()}`);
             });
     };
 

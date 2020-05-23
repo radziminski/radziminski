@@ -18,7 +18,7 @@ namespace Calendar.Controllers
                 !int.TryParse(Date.Substring(5, 2), out month) ||
                 !int.TryParse(Date.Substring(8, 2), out day))
                 return null;
-            if (year > 2050 || year < 1900 || month < 1 || month > 11 || day < 1 || day > 31)
+            if (year > 2050 || year < 1900 || month < 1 || month > 12 || day < 1 || day > 31)
                 return null;
             return new DateTime(year, month, day, 0, 0, 0);
         }

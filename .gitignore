@@ -3,4 +3,5 @@
 /React.js/development/frontend/node_modules
 /React.js/development/backend/bin
 /React.js/development/backend/obj
-
+/React.js/production/obj
+/React.js/production/bin
